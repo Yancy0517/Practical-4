@@ -1,11 +1,20 @@
+####---------- Group members ---------------------------------------------------
+## Linsheng Shu (s2317223)
+## Jialong He (s2281875)
+## Heyu Nie (s2404675)
+
+####---------- Github Repo -----------------------------------------------------
+## https://github.com/Yancy0517/Practical-4.git
+
+####------- Group member contribution ------------------------------------------
+##
+
+
 newt <- function(theta, func, grad, hess,..., tol=1e-8, fscale=1, maxit=100,
                  max.half=20, eps=1e-6){
-  n <-length(theta)
-  # mf <- 0
-  # mtheta <- 0 
-  iter <- 0
-  # mg <- 0
-  # mHi <-0
+  n <-length(theta) # number of optimization parameters
+  iter <- 0 # iteration times starts from 0
+
   if(iter == 0 && is.infinite(func(theta,...)) && is.infinite(grad(theta,...))){
     stop("The objective or derivatives are not finite at the initial theta")
   }
@@ -71,16 +80,32 @@ newt <- function(theta, func, grad, hess,..., tol=1e-8, fscale=1, maxit=100,
         return(final)
       }
     }
-    # mf <- f1
-    # mtheta <- theta
-    # mg <- g1
-    # mHi <- hi
+
     iter <- iter + 1 
   }
+  
   if(iter > maxit){
     stop("The maximum iteration(", maxit, ") is reached without convergence")
   }
+  
   final = list('f' = mf, 'theta' = mtheta, 'iter' = iter, 
                'g' = mg, 'Hi' = hi)
   return(final)
+}
+
+# If the Hessian matrix is not provided, we need to manually obtain an
+# approximation to it by finite differencing of gradient vector which is
+# returned by function "grad".
+approximate_hess <- function(grad, theta, eps, n){
+  grad0 <- grad(theta) # original gradient 
+  h <- matrix(0, n, n) # an empty matrix for Hessian
+  
+  # loop over parameters
+  for(i in 1:n){
+    # increase i-th parameter by "eps" which is the finite difference interval
+    th1 <- theta; th1[i] <- th1[i] + eps  
+    grad1 <- grad(th1) # obtain new gradient from updated parameter
+    h[i,] <- (grad1 - grad0)/eps # approximate second derivative
+  }
+  (t(h) + h) / 2 # make it exactly symmetric
 }
