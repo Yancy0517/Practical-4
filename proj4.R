@@ -51,4 +51,36 @@ newt <- function(theta, func, grad, hess,..., tol=1e-8, fscale=1, maxit=100,
     }
     
     g1 <- grad(theta,...)
+    
+    if(is.null(hess)){
+      h1 <- approximate_hess(grad, theta, eps, n)
+    }
+    else{
+      h1 <- hess(theta,...)
+    }
+    
+    ec <- eigen(h1)
+    minvalue <- min(ec$values)
+    if(max(abs(g1)) < tol * (abs(f1) + fscale) ){
+      if(minvalue <= 0){
+        stop("The Hessian is not positive definite at convergence")
+      }
+      else{
+        final = list('f' = f1, 'theta' = theta, 'iter' = iter, 'g' = g1, 
+                     'Hi' = chol2inv(chol(h1)))
+        return(final)
+      }
+    }
+    # mf <- f1
+    # mtheta <- theta
+    # mg <- g1
+    # mHi <- hi
+    iter <- iter + 1 
+  }
+  if(iter > maxit){
+    stop("The maximum iteration(", maxit, ") is reached without convergence")
+  }
+  final = list('f' = mf, 'theta' = mtheta, 'iter' = iter, 
+               'g' = mg, 'Hi' = hi)
+  return(final)
 }
