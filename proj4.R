@@ -84,7 +84,7 @@ newt <- function(theta, func, grad, hess,..., tol=1e-8, fscale=1, maxit=100,
         break
       }
     }
-    # theta <- theta1
+     theta <- theta1
     
     # if the number of times the step is halved exceed its maximum, 
     # stop the process and raise error
@@ -142,5 +142,9 @@ approximate_hess <- function(grad,..., theta, eps, n){
     h[i,] <- (grad1 - grad0)/eps # approximate second derivative
   }
   (t(h) + h) / 2 # make it exactly symmetric
-}
+  
+newt(c(1,2),rb, gb, hb)
+
+
 ################################################################################
+}
